@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Ticket System{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h2>Welcome to Ticket Rising</h2>
+    <p>Your reliable IT support ticket system for company internal helpdesk.</p>
+    <p>Supports both offline (LAN) and online (cloud) deployment.</p>
+    {% if not session.loggedin %}
+        <a href="{{ url_for('login') }}" class="btn">Get Started</a>
+    {% endif %}
+</section>
+
+<section class="features">
+    <h3>Features</h3>
+    <div class="feature-grid">
+        <div class="feature">
+            <h4>Raise & Track Tickets</h4>
+            <p>Easily submit IT issues and track their progress.</p>
+        </div>
+        <div class="feature">
+            <h4>Role-Based Access</h4>
+            <p>Different permissions for users, admins, and technicians.</p>
+        </div>
+        <div class="feature">
+            <h4>Flexible Deployment</h4>
+            <p>Works on local networks or in the cloud.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

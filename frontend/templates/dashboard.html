@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Ticket System{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ session.username }}!</h2>
+<p>Role: {{ session.role }}</p>
+
+<h3>Your Tickets</h3>
+{% if tickets %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td>{{ ticket.priority }}</td>
+                    <td>{{ ticket.status }}</td>
+                    <td>{{ ticket.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No tickets found.</p>
+{% endif %}
+
+<a href="{{ url_for('raise_ticket') }}" class="btn">Raise New Ticket</a>
+{% endblock %}
