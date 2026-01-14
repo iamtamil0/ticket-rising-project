@@ -1,56 +1,35 @@
-from flask import Blueprint, request, redirect, url_for, session, render_template_string
+from flask import Flask, session, redirect, url_for
+from auth import auth
+from tickets import tickets_bp
 
-auth = Blueprint("auth", __name__)
+app = Flask(__name__)
+app.secret_key = "ticket-secret-key"
 
-# Temporary in-memory users
-users = {}
+app.register_blueprint(auth)
+app.register_blueprint(tickets_bp)
 
-@auth.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        role = request.form["role"]
+@app.route("/")
+def home():
+    return redirect(url_for("auth.login"))
 
-        users[email] = {
-            "password": password,
-            "role": role
-        }
+@app.route("/dashboard")
+def dashboard():
+    if "user" not in session:
         return redirect(url_for("auth.login"))
 
-    return render_template_string("""
-    <h2>Register</h2>
-    <form method="post">
-        Email: <input name="email" required><br>
-        Password: <input type="password" name="password" required><br>
-        Role:
-        <select name="role">
-            <option value="user">User</option>
-            <option value="technician">Technician</option>
-            <option value="admin">Admin</option>
-        </select><br>
-        <button type="submit">Register</button>
-    </form>
-    """)
+    return f"""
+    <h2>Dashboard</h2>
+    Logged in as: {session['user']}<br>
+    Role: {session['role']}<br><br>
+    <a href="/create-ticket">Create Ticket</a><br>
+    <a href="/tickets">View Tickets</a><br><br>
+    <a href="/logout">Logout</a>
+    """
 
-@auth.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("auth.login"))
 
-        if email in users and users[email]["password"] == password:
-            session["user"] = email
-            session["role"] = users[email]["role"]
-            return redirect(url_for("dashboard"))
-
-        return "Invalid credentials"
-
-    return render_template_string("""
-    <h2>Login</h2>
-    <form method="post">
-        Email: <input name="email" required><br>
-        Password: <input type="password" name="password" required><br>
-        <button type="submit">Login</button>
-    </form>
-    """)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)

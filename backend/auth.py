@@ -2,34 +2,38 @@ from flask import Blueprint, request, redirect, url_for, session, render_templat
 
 auth = Blueprint("auth", __name__)
 
-#Temporary in-memory users
+# Temporary in-memory users
+users = {}
 
 @auth.route("/register", methods=["GET", "POST"])
 def register():
-    if request.mother == "POST":
-        email =request.from["email"]
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+        role = request.form["role"]
+
         users[email] = {
-            "password": request.form["password"],
-            "role": request.form["role"]
+            "password": password,
+            "role": role
         }
         return redirect(url_for("auth.login"))
-    
+
     return render_template_string("""
     <h2>Register</h2>
     <form method="post">
-        Email: <input name="email"><br>
-        Password: <input type="password" name="password"><br>
+        Email: <input name="email" required><br>
+        Password: <input type="password" name="password" required><br>
         Role:
         <select name="role">
             <option value="user">User</option>
             <option value="technician">Technician</option>
             <option value="admin">Admin</option>
         </select><br>
-        <button>Register</button>
+        <button type="submit">Register</button>
     </form>
     """)
 
-@auth.route("/Login", methods=["GET", "POST"])
+@auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form["email"]
@@ -39,14 +43,14 @@ def login():
             session["user"] = email
             session["role"] = users[email]["role"]
             return redirect(url_for("dashboard"))
-        
-        return "Invalid credentials", 401
-    
+
+        return "Invalid credentials"
+
     return render_template_string("""
-                                  <h2>Login</h2>
-                                  <form method="post">
-                                      Email: <input name="email"><br>
-                                      Password: <input type="password" name="password"><br>
-                                      <button>Login</button>
-                                  </form>
-                                  """)
+    <h2>Login</h2>
+    <form method="post">
+        Email: <input name="email" required><br>
+        Password: <input type="password" name="password" required><br>
+        <button type="submit">Login</button>
+    </form>
+    """)
