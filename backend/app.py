@@ -2,8 +2,10 @@ from flask import Flask, session, redirect, url_for
 from auth import auth
 from tickets import tickets_bp
 
+import os
 app = Flask(__name__)
-app.secret_key = "ticket-secret-key"
+import os
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
 
 app.register_blueprint(auth)
 app.register_blueprint(tickets_bp)
